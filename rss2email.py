@@ -28,9 +28,6 @@ urllib2.install_opener(urllib2.build_opener())
 
 ### Vaguely Customizable Options ###
 
-# Extra message added at the top of the mail (Benjamin Richter 2012-06-04)
-EXTRA_MESSAGE = ''
-
 # The email address messages are from by default:
 DEFAULT_FROM = "bozo@dev.null.invalid"
 
@@ -417,8 +414,7 @@ def getName(r, entry):
 	if hasattr(r, "url") and r.url in OVERRIDE_FROM.keys():
 		return OVERRIDE_FROM[r.url]
 	
-	#name = feed.get('title', '')
-	name = ''
+	name = feed.get('title', '')
 
 	if 'name' in entry.get('author_detail', []): # normally {} but py2.1
 		if entry.author_detail.name:
@@ -679,10 +675,7 @@ def run(num=None):
 					from_addr = getEmail(r, entry)
 					
 					name = h2t.unescape(getName(r, entry))
-					if FORCE_FROM_NAME:
-						fromhdr = formataddr((DEFAULT_FROM_NAME, from_addr,))
-					else:
-						fromhdr = formataddr((name, from_addr,))
+					fromhdr = formataddr((name, from_addr,))
 					tohdr = (f.to or default_to)
 					subjecthdr = title
 					datehdr = time.strftime("%a, %d %b %Y %H:%M:%S -0000", datetime)
@@ -720,13 +713,13 @@ def run(num=None):
 						content += '<h1'
 						content += ' class="header"'
 						content += '><a href="'+link+'">'+subjecthdr+'</a></h1>\n'
-						content += '<p>Autor: ' + name + '</p>\n'
 						if ishtml(entrycontent):
 							body = entrycontent[1].strip()
 						else:
 							body = entrycontent.strip()
 						if body != '':	
 							content += '<div id="body"><table><tr><td>\n' + body + '</td></tr></table></div>\n'
+						content += '\n<p class="footer">URL: <a href="'+link+'">'+link+'</a>'
 						if hasattr(entry,'enclosures'):
 							for enclosure in entry.enclosures:
 								if (hasattr(enclosure, 'url') and enclosure.url != ""):
@@ -740,7 +733,6 @@ def run(num=None):
 									extraurl = extraurl.replace('http://www.google.com/reader/public/atom/', 'http://www.google.com/reader/view/')
 									content += '<br/>Via: <a href="'+extraurl+'">'+extralink['title']+'</a>\n'
 						content += '</p></div>\n'
-						body += '<p>'+EXTRA_MESSAGE+'</p>\n'
 						content += "\n\n</body></html>"
 					else:	
 						if ishtml(entrycontent):
@@ -748,10 +740,9 @@ def run(num=None):
 							content = "<html>\n" 
 							content = ("<html><body>\n\n" + 
 							           '<h1><a href="'+link+'">'+subjecthdr+'</a></h1>\n\n' +
-								   '<p>Autor: ' + name + '</p>\n' +
-								   entrycontent[1].strip() # drop type tag (HACK: bad abstraction)
-								   )
-								   
+							           entrycontent[1].strip() + # drop type tag (HACK: bad abstraction)
+							           '<p>URL: <a href="'+link+'">'+link+'</a></p>' )
+							           
 							if hasattr(entry,'enclosures'):
 								for enclosure in entry.enclosures:
 									if enclosure.url != "":
@@ -760,10 +751,10 @@ def run(num=None):
 								for extralink in entry.links:
 									if ('rel' in extralink) and extralink['rel'] == u'via':
 										content += 'Via: <a href="'+extralink['href']+'">'+extralink['title']+'</a><br/>\n'
-							content += '<p>'+EXTRA_MESSAGE+'</p>' + '\n</body></html>'
+                                                                
+							content += ("\n</body></html>")
 						else:
-							content = subjecthdr+'\n'+link+'\n'+'Autor: '+name+'\n\n'
-							content += entrycontent.strip()
+							content = entrycontent.strip() + "\n\nURL: "+link
 							if hasattr(entry,'enclosures'):
 								for enclosure in entry.enclosures:
 									if enclosure.url != "":
@@ -772,7 +763,6 @@ def run(num=None):
 								for extralink in entry.links:
 									if ('rel' in extralink) and extralink['rel'] == u'via':
 										content += '<a href="'+extralink['href']+'">Via: '+extralink['title']+'</a>\n'
-							content += '\n\n' + EXTRA_MESSAGE+'\n\n'
 
 					smtpserver = send(fromhdr, tohdr, subjecthdr, content, contenttype, extraheaders, smtpserver)
 			

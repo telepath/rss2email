@@ -2,7 +2,6 @@
 
 # The email address messages are from by default:
 DEFAULT_FROM = "bozo@dev.null.invalid"
-DEFAULT_FROM_NAME = "Antragssystem Vorstand"
 
 # 1: Send text/html messages when possible.
 # 0: Convert HTML to plain text.
@@ -11,7 +10,6 @@ HTML_MAIL = 1
 # 1: Only use the DEFAULT_FROM address.
 # 0: Use the email address specified by the feed, when possible.
 FORCE_FROM = 0
-FORCE_FROM_NAME = 1
 
 # 1: Receive one email per post.
 # 0: Receive an email every time a post changes.
