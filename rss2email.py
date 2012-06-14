@@ -220,7 +220,7 @@ def send(sender, recipient, subject, body, contenttype, extraheaders=None, smtps
 
 	else:
 		try:
-			p = subprocess.Popen(["/usr/sbin/sendmail", recipient], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+			p = subprocess.Popen(["/usr/sbin/sendmail", "-f", sender_addr, recipient], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 			p.communicate(msg_as_string)
 			status = p.returncode
 			assert status != None, "just a sanity check"
